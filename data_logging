@@ -1,0 +1,35 @@
+import time
+import board
+import busio
+import adafruit_bmp280
+import adafruit_mpu6050
+import digitalio
+import board
+import adafruit_sdcard
+import storage
+
+i2c = busio.I2C(board.SCL, board.SDA)
+bmp280 = adafruit_bmp280.Adafruit_BMP280_I2C(i2c)
+mpu6050 = adafruit_mpu6050.MPU6050(i2c)
+
+spi = board.SPI()
+cs = digitalio.DigitalInOut(board.D5)
+sd_card = adafruit_sdcard.SDCard(spi, cs)
+vfs = storage.VfsFat(sd_card)
+storage.mount(vfs, "/sd")
+
+log_file = open("/sd/log.txt", "a")
+
+def log_data():
+    temperature = bmp280.temperature
+    pressure = bmp280.pressure
+    altitude = bmp280.altitude
+    acceleration = mpu6050.acceleration
+    gyro = mpu6050.gyro
+
+    log_file.write(f"Time: {time.time()}, Temperature: {temperature}, Pressure: {pressure}, Altitude: {altitude}, Acceleration: {acceleration}, Gyro: {gyro}\n")
+    log_file.flush()
+
+while True:
+    log_data()
+    time.sleep(1)

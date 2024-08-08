@@ -3,7 +3,8 @@ from tkinter import ttk
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from sensor_data import get_sensor_readings
-from motor import Motor
+from motor import motor
+from parachute_controller import release_parachute
 
 class SensorMotorDashboard(tk.Tk):
     def __init__(self):
@@ -13,9 +14,9 @@ class SensorMotorDashboard(tk.Tk):
         
         self.bg_color = "#221a0e"
         self.fg_color = "#d4d4d4"
+        self.accent_color = "#569cd6"
         
         self.configure(bg=self.bg_color)
-        
         self.default_font = ("Menlo", 14)
 
         self.sensor_frame = ttk.LabelFrame(self, text="Sensor Data", padding=(10, 5))
@@ -27,28 +28,32 @@ class SensorMotorDashboard(tk.Tk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
-        
+
         self.sensor_labels = {
-            "Acceleration X": tk.Label(self.sensor_frame, text="Acceleration X: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
-            "Acceleration Y": tk.Label(self.sensor_frame, text="Acceleration Y: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
-            "Acceleration Z": tk.Label(self.sensor_frame, text="Acceleration Z: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
-            "Gyroscope X": tk.Label(self.sensor_frame, text="Gyroscope X: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
-            "Gyroscope Y": tk.Label(self.sensor_frame, text="Gyroscope Y: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
-            "Gyroscope Z": tk.Label(self.sensor_frame, text="Gyroscope Z: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
+            "Acceleration X": tk.Label(self.sensor_frame, text="Acceleration X: 0", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
+            "Acceleration Y": tk.Label(self.sensor_frame, text="Acceleration Y: 0", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
+            "Acceleration Z": tk.Label(self.sensor_frame, text="Acceleration Z: 0", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
+            "Gyroscope X": tk.Label(self.sensor_frame, text="Gyroscope X: 0", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
+            "Gyroscope Y": tk.Label(self.sensor_frame, text="Gyroscope Y: 0", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
+            "Gyroscope Z": tk.Label(self.sensor_frame, text="Gyroscope Z: 0", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
         }
         
-        for index, (label_text, label_widget) in enumerate(self.sensor_labels.items()):
+        for index, label_widget in enumerate(self.sensor_labels.values()):
             label_widget.grid(row=index, column=0, sticky="w")
         
         self.motor_labels = {
-            "Power": tk.Label(self.motor_frame, text="Power: 0 HP", bg="#403C3C", fg=self.fg_color, font=self.default_font),
-            "Torque": tk.Label(self.motor_frame, text="Torque: 0 Nm", bg="#403C3C", fg=self.fg_color, font=self.default_font),
-            "Efficiency": tk.Label(self.motor_frame, text="Efficiency: 0%", bg="#403C3C", fg=self.fg_color, font=self.default_font),
-            "Weight": tk.Label(self.motor_frame, text="Weight: 0 kg", bg="#403C3C", fg=self.fg_color, font=self.default_font),
+            "Power": tk.Label(self.motor_frame, text="Power: 0 HP", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
+            "Torque": tk.Label(self.motor_frame, text="Torque: 0 Nm", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
+            "Efficiency": tk.Label(self.motor_frame, text="Efficiency: 0%", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
+            "Weight": tk.Label(self.motor_frame, text="Weight: 0 kg", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
         }
         
-        for index, (label_text, label_widget) in enumerate(self.motor_labels.items()):
+        for index, label_widget in enumerate(self.motor_labels.values()):
             label_widget.grid(row=index, column=0, sticky="w")
+        
+        # Adding the parachute release button
+        self.parachute_button = tk.Button(self.motor_frame, text="Release Parachute", command=self.release_parachute, bg=self.accent_color, fg=self.fg_color, font=self.default_font)
+        self.parachute_button.grid(row=4, column=0, pady=10, sticky="w")
         
         self.figure = Figure(figsize=(8, 6), dpi=100, facecolor=self.bg_color)
         self.ax_accel = self.figure.add_subplot(211, facecolor=self.bg_color)
@@ -75,8 +80,6 @@ class SensorMotorDashboard(tk.Tk):
         }
         
         self.grid_columnconfigure(1, weight=1)
-        
-        self.motor = Motor(power_hp=500, torque_nm=700, efficiency_percent=85, weight_kg=350)
         
         self.update_sensor_data()
         self.update_motor_stats()
@@ -126,11 +129,17 @@ class SensorMotorDashboard(tk.Tk):
         self.after(100, self.update_sensor_data)
     
     def update_motor_stats(self):
-        stats = self.motor.get_stats()
-        for stat_name, stat_value in stats.items():
-            self.motor_labels[stat_name].config(text=f"{stat_name}: {stat_value}")
+        stats = motor.get_stats()
+        self.motor_labels["Power"].config(text=f"Power: {stats['Power']}")
+        self.motor_labels["Torque"].config(text=f"Torque: {stats['Torque']}")
+        self.motor_labels["Efficiency"].config(text=f"Efficiency: {stats['Efficiency']}")
+        self.motor_labels["Weight"].config(text=f"Weight: {stats['Weight']}")
         
         self.after(1000, self.update_motor_stats)
+    
+    def release_parachute(self):
+        release_parachute()
+        print("Parachute released via dashboard.")
 
 if __name__ == "__main__":
     dashboard = SensorMotorDashboard()

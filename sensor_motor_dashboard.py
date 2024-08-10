@@ -5,6 +5,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from sensor_data import get_sensor_readings
 from motor import motor
 from parachute_controller import release_parachute
+from gpio_controller import trigger_delay_charge, initialize_gpio, cleanup_gpio
 
 class SensorMotorDashboard(tk.Tk):
     def __init__(self):
@@ -54,6 +55,10 @@ class SensorMotorDashboard(tk.Tk):
         # Adding the parachute release button
         self.parachute_button = tk.Button(self.motor_frame, text="Release Parachute", command=self.release_parachute, bg=self.accent_color, fg=self.fg_color, font=self.default_font)
         self.parachute_button.grid(row=4, column=0, pady=10, sticky="w")
+
+        # Adding the delay charge trigger button
+        self.delay_charge_button = tk.Button(self.motor_frame, text="Trigger Delay Charge", command=self.trigger_delay_charge, bg=self.accent_color, fg=self.fg_color, font=self.default_font)
+        self.delay_charge_button.grid(row=5, column=0, pady=10, sticky="w")
         
         self.figure = Figure(figsize=(8, 6), dpi=100, facecolor=self.bg_color)
         self.ax_accel = self.figure.add_subplot(211, facecolor=self.bg_color)
@@ -130,17 +135,19 @@ class SensorMotorDashboard(tk.Tk):
     
     def update_motor_stats(self):
         stats = motor.get_stats()
-        self.motor_labels["Power"].config(text=f"Power: {stats['Power']}")
-        self.motor_labels["Torque"].config(text=f"Torque: {stats['Torque']}")
-        self.motor_labels["Efficiency"].config(text=f"Efficiency: {stats['Efficiency']}")
-        self.motor_labels["Weight"].config(text=f"Weight: {stats['Weight']}")
+        for stat_name, stat_value in stats.items():
+            self.motor_labels[stat_name].config(text=f"{stat_name}: {stat_value}")
         
         self.after(1000, self.update_motor_stats)
-    
+
+    def trigger_delay_charge(self):
+        trigger_delay_charge()
+
     def release_parachute(self):
         release_parachute()
-        print("Parachute released via dashboard.")
 
 if __name__ == "__main__":
+    initialize_gpio()
     dashboard = SensorMotorDashboard()
     dashboard.mainloop()
+    cleanup_gpio()

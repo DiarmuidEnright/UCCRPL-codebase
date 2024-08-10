@@ -17,3 +17,8 @@ def trigger_delay_charge():
 
 def cleanup_gpio():
     GPIO.cleanup()
+
+#sync to max height somehow; figure out
+
+def sync_charge_to_max_height():
+    pass

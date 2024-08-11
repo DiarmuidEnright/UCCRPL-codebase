@@ -1,11 +1,18 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, simpledialog, messagebox
+import time
+import random
+from threading import Thread
+from flask import Flask, request
+import RPi.GPIO as GPIO
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+from gpio_controller import trigger_delay_charge, release_parachute, initialize_gpio, cleanup_gpio
+from motor import Motor
 from sensor_data import get_sensor_readings
-from motor import motor
-from parachute_controller import release_parachute
-from gpio_controller import trigger_delay_charge, initialize_gpio, cleanup_gpio
+from failsafe import start_failsafe_monitoring
+from auth import authenticate
 
 class SensorMotorDashboard(tk.Tk):
     def __init__(self):
@@ -18,6 +25,7 @@ class SensorMotorDashboard(tk.Tk):
         self.accent_color = "#569cd6"
         
         self.configure(bg=self.bg_color)
+        
         self.default_font = ("Menlo", 14)
 
         self.sensor_frame = ttk.LabelFrame(self, text="Sensor Data", padding=(10, 5))
@@ -29,36 +37,28 @@ class SensorMotorDashboard(tk.Tk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
-
+        
         self.sensor_labels = {
-            "Acceleration X": tk.Label(self.sensor_frame, text="Acceleration X: 0", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
-            "Acceleration Y": tk.Label(self.sensor_frame, text="Acceleration Y: 0", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
-            "Acceleration Z": tk.Label(self.sensor_frame, text="Acceleration Z: 0", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
-            "Gyroscope X": tk.Label(self.sensor_frame, text="Gyroscope X: 0", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
-            "Gyroscope Y": tk.Label(self.sensor_frame, text="Gyroscope Y: 0", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
-            "Gyroscope Z": tk.Label(self.sensor_frame, text="Gyroscope Z: 0", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
+            "Acceleration X": tk.Label(self.sensor_frame, text="Acceleration X: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
+            "Acceleration Y": tk.Label(self.sensor_frame, text="Acceleration Y: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
+            "Acceleration Z": tk.Label(self.sensor_frame, text="Acceleration Z: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
+            "Gyroscope X": tk.Label(self.sensor_frame, text="Gyroscope X: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
+            "Gyroscope Y": tk.Label(self.sensor_frame, text="Gyroscope Y: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
+            "Gyroscope Z": tk.Label(self.sensor_frame, text="Gyroscope Z: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
         }
         
-        for index, label_widget in enumerate(self.sensor_labels.values()):
+        for index, (label_text, label_widget) in enumerate(self.sensor_labels.items()):
             label_widget.grid(row=index, column=0, sticky="w")
         
         self.motor_labels = {
-            "Power": tk.Label(self.motor_frame, text="Power: 0 HP", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
-            "Torque": tk.Label(self.motor_frame, text="Torque: 0 Nm", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
-            "Efficiency": tk.Label(self.motor_frame, text="Efficiency: 0%", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
-            "Weight": tk.Label(self.motor_frame, text="Weight: 0 kg", bg=self.bg_color, fg=self.fg_color, font=self.default_font),
+            "Power": tk.Label(self.motor_frame, text="Power: 0 HP", bg="#403C3C", fg=self.fg_color, font=self.default_font),
+            "Torque": tk.Label(self.motor_frame, text="Torque: 0 Nm", bg="#403C3C", fg=self.fg_color, font=self.default_font),
+            "Efficiency": tk.Label(self.motor_frame, text="Efficiency: 0%", bg="#403C3C", fg=self.fg_color, font=self.default_font),
+            "Weight": tk.Label(self.motor_frame, text="Weight: 0 kg", bg="#403C3C", fg=self.fg_color, font=self.default_font),
         }
         
-        for index, label_widget in enumerate(self.motor_labels.values()):
+        for index, (label_text, label_widget) in enumerate(self.motor_labels.items()):
             label_widget.grid(row=index, column=0, sticky="w")
-        
-        # Adding the parachute release button
-        self.parachute_button = tk.Button(self.motor_frame, text="Release Parachute", command=self.release_parachute, bg=self.accent_color, fg=self.fg_color, font=self.default_font)
-        self.parachute_button.grid(row=4, column=0, pady=10, sticky="w")
-
-        # Adding the delay charge trigger button
-        self.delay_charge_button = tk.Button(self.motor_frame, text="Trigger Delay Charge", command=self.trigger_delay_charge, bg=self.accent_color, fg=self.fg_color, font=self.default_font)
-        self.delay_charge_button.grid(row=5, column=0, pady=10, sticky="w")
         
         self.figure = Figure(figsize=(8, 6), dpi=100, facecolor=self.bg_color)
         self.ax_accel = self.figure.add_subplot(211, facecolor=self.bg_color)
@@ -89,6 +89,8 @@ class SensorMotorDashboard(tk.Tk):
         self.update_sensor_data()
         self.update_motor_stats()
 
+        start_failsafe_monitoring()  # Start monitoring altitude for failsafe
+
     def update_sensor_data(self):
         accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z = get_sensor_readings()
         self.sensor_labels["Acceleration X"].config(text=f"Acceleration X: {accel_x:.2f}")
@@ -111,43 +113,55 @@ class SensorMotorDashboard(tk.Tk):
                 self.sensor_data[key].pop(0)
         
         self.ax_accel.clear()
+        self.ax_accel.plot(self.sensor_data["accel_x"], label="Acceleration X", color="#1f77b4")
+        self.ax_accel.plot(self.sensor_data["accel_y"], label="Acceleration Y", color="#ff7f0e")
+        self.ax_accel.plot(self.sensor_data["accel_z"], label="Acceleration Z", color="#2ca02c")
+        self.ax_accel.legend(loc="upper left", fontsize=10)
+        self.ax_accel.grid(True)
+        
         self.ax_gyro.clear()
-        
-        colors_accel = ["#DC3958", "#F79A32", "#D3AF86"]
-        colors_gyro = ["#F79A32", "#889B4A", "#088649"]
-        
-        self.ax_accel.plot(self.sensor_data["accel_x"], label="Accel X", color=colors_accel[0])
-        self.ax_accel.plot(self.sensor_data["accel_y"], label="Accel Y", color=colors_accel[1])
-        self.ax_accel.plot(self.sensor_data["accel_z"], label="Accel Z", color=colors_accel[2])
-        self.ax_accel.legend(loc="upper right", frameon=True, fontsize='small', prop={'family': 'Menlo'})
-        self.ax_accel.grid(True, color=self.fg_color, linestyle='--', linewidth=0.5)
-        self.ax_accel.tick_params(axis='both', colors=self.fg_color)
-        
-        self.ax_gyro.plot(self.sensor_data["gyro_x"], label="Gyro X", color=colors_gyro[0])
-        self.ax_gyro.plot(self.sensor_data["gyro_y"], label="Gyro Y", color=colors_gyro[1])
-        self.ax_gyro.plot(self.sensor_data["gyro_z"], label="Gyro Z", color=colors_gyro[2])
-        self.ax_gyro.legend(loc="upper right", frameon=True, fontsize='small', prop={'family': 'Menlo'})
-        self.ax_gyro.grid(True, color=self.fg_color, linestyle='--', linewidth=0.5)
-        self.ax_gyro.tick_params(axis='both', colors=self.fg_color)
+        self.ax_gyro.plot(self.sensor_data["gyro_x"], label="Gyroscope X", color="#d62728")
+        self.ax_gyro.plot(self.sensor_data["gyro_y"], label="Gyroscope Y", color="#9467bd")
+        self.ax_gyro.plot(self.sensor_data["gyro_z"], label="Gyroscope Z", color="#8c564b")
+        self.ax_gyro.legend(loc="upper left", fontsize=10)
+        self.ax_gyro.grid(True)
         
         self.canvas.draw()
-        self.after(100, self.update_sensor_data)
-    
-    def update_motor_stats(self):
-        stats = motor.get_stats()
-        for stat_name, stat_value in stats.items():
-            self.motor_labels[stat_name].config(text=f"{stat_name}: {stat_value}")
-        
-        self.after(1000, self.update_motor_stats)
+        self.after(1000, self.update_sensor_data)
 
+    def update_motor_stats(self):
+        motor = Motor()
+        self.motor_labels["Power"].config(text=f"Power: {motor.power:.2f} HP")
+        self.motor_labels["Torque"].config(text=f"Torque: {motor.torque:.2f} Nm")
+        self.motor_labels["Efficiency"].config(text=f"Efficiency: {motor.efficiency:.2f}%")
+        self.motor_labels["Weight"].config(text=f"Weight: {motor.weight:.2f} kg")
+        self.after(1000, self.update_motor_stats)
+    
     def trigger_delay_charge(self):
-        trigger_delay_charge()
+        self.request_authorization()
+        if self.is_authorized:
+            trigger_delay_charge()
 
     def release_parachute(self):
-        release_parachute()
+        self.request_authorization()
+        if self.is_authorized:
+            release_parachute()
+
+    def request_authorization(self):
+        username = simpledialog.askstring("Authentication", "Enter Username:", parent=self)
+        password = simpledialog.askstring("Authentication", "Enter Password:", parent=self, show='*')
+
+        if authenticate(username, password):
+            self.is_authorized = True
+        else:
+            self.is_authorized = False
+            messagebox.showerror("Authentication Failed", "Incorrect username or password")
+
 
 if __name__ == "__main__":
     initialize_gpio()
-    dashboard = SensorMotorDashboard()
-    dashboard.mainloop()
-    cleanup_gpio()
+    try:
+        dashboard = SensorMotorDashboard()
+        dashboard.mainloop()
+    finally:
+        cleanup_gpio()

@@ -8,3 +8,6 @@ def get_sensor_readings():
     gyro_y = random.uniform(-180, 180)
     gyro_z = random.uniform(-180, 180)
     return accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z
+
+
+# Add altitude sensor tomorrow

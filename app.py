@@ -2,9 +2,28 @@ from flask import Flask, request
 from gpio_controller import initialize_gpio
 from sensor_motor_dashboard import SensorMotorDashboard
 from parachute_controller import initialize_parachute, release_parachute, check_and_release_parachute
+from iot_client import IoTClient, iot_callback
+from autopilot import Autopilot
+from rth import ReturnToHome
+from ai_decision_making import AIDecisionMaking
+from parachute_controller import ParachuteController
+from delay_charge_controller import DelayChargeController
 import time
 
 app = Flask(__name__)
+
+def initialize_iot():
+    global iot_client
+    iot_client = IoTClient(
+        client_id="rocketClient",
+        endpoint="your-endpoint.amazonaws.com",
+        cert_path="cert.pem",
+        key_path="private.key",
+        root_ca_path="root-ca.pem"
+    )
+    iot_client.connect()
+    iot_client.subscribe("rocket/control", iot_callback)
+
 
 @app.route('/launch', methods=['POST'])
 def launch():
@@ -37,6 +56,7 @@ def altitude_check():
     return f"Altitude checked: {altitude} meters.", 200
 
 if __name__ == "__main__":
+    initialize_iot()
     initialize_gpio()
     initialize_parachute()
     app.run(host='0.0.0.0', port=5000)

@@ -7,12 +7,15 @@ from flask import Flask, request
 import RPi.GPIO as GPIO
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
+import logging
 from gpio_controller import trigger_delay_charge, release_parachute, initialize_gpio, cleanup_gpio
 from motor import Motor
 from sensor_data import get_sensor_readings
 from failsafe import start_failsafe_monitoring
 from auth import authenticate
+
+logging.basicConfig(filename="rocket_dashboard.log", level=logging.DEBUG, 
+                    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 class SensorMotorDashboard(tk.Tk):
     def __init__(self):
@@ -86,76 +89,110 @@ class SensorMotorDashboard(tk.Tk):
         
         self.grid_columnconfigure(1, weight=1)
         
-        self.update_sensor_data()
-        self.update_motor_stats()
-
-        start_failsafe_monitoring()  # Start monitoring altitude for failsafe
+        try:
+            self.update_sensor_data()
+            self.update_motor_stats()
+            start_failsafe_monitoring()  # Start monitoring altitude for failsafe
+            logging.info("Dashboard initialized successfully.")
+        except Exception as e:
+            logging.error(f"Error initializing dashboard: {e}")
+            messagebox.showerror("Initialization Error", f"Failed to initialize the dashboard: {e}")
 
     def update_sensor_data(self):
-        accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z = get_sensor_readings()
-        self.sensor_labels["Acceleration X"].config(text=f"Acceleration X: {accel_x:.2f}")
-        self.sensor_labels["Acceleration Y"].config(text=f"Acceleration Y: {accel_y:.2f}")
-        self.sensor_labels["Acceleration Z"].config(text=f"Acceleration Z: {accel_z:.2f}")
-        self.sensor_labels["Gyroscope X"].config(text=f"Gyroscope X: {gyro_x:.2f}")
-        self.sensor_labels["Gyroscope Y"].config(text=f"Gyroscope Y: {gyro_y:.2f}")
-        self.sensor_labels["Gyroscope Z"].config(text=f"Gyroscope Z: {gyro_z:.2f}")
-        
-        self.sensor_data["accel_x"].append(accel_x)
-        self.sensor_data["accel_y"].append(accel_y)
-        self.sensor_data["accel_z"].append(accel_z)
-        self.sensor_data["gyro_x"].append(gyro_x)
-        self.sensor_data["gyro_y"].append(gyro_y)
-        self.sensor_data["gyro_z"].append(gyro_z)
-        
-        max_length = 50
-        for key in self.sensor_data:
-            if len(self.sensor_data[key]) > max_length:
-                self.sensor_data[key].pop(0)
-        
-        self.ax_accel.clear()
-        self.ax_accel.plot(self.sensor_data["accel_x"], label="Acceleration X", color="#1f77b4")
-        self.ax_accel.plot(self.sensor_data["accel_y"], label="Acceleration Y", color="#ff7f0e")
-        self.ax_accel.plot(self.sensor_data["accel_z"], label="Acceleration Z", color="#2ca02c")
-        self.ax_accel.legend(loc="upper left", fontsize=10)
-        self.ax_accel.grid(True)
-        
-        self.ax_gyro.clear()
-        self.ax_gyro.plot(self.sensor_data["gyro_x"], label="Gyroscope X", color="#d62728")
-        self.ax_gyro.plot(self.sensor_data["gyro_y"], label="Gyroscope Y", color="#9467bd")
-        self.ax_gyro.plot(self.sensor_data["gyro_z"], label="Gyroscope Z", color="#8c564b")
-        self.ax_gyro.legend(loc="upper left", fontsize=10)
-        self.ax_gyro.grid(True)
-        
-        self.canvas.draw()
-        self.after(1000, self.update_sensor_data)
+        try:
+            accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z = get_sensor_readings()
+            self.sensor_labels["Acceleration X"].config(text=f"Acceleration X: {accel_x:.2f}")
+            self.sensor_labels["Acceleration Y"].config(text=f"Acceleration Y: {accel_y:.2f}")
+            self.sensor_labels["Acceleration Z"].config(text=f"Acceleration Z: {accel_z:.2f}")
+            self.sensor_labels["Gyroscope X"].config(text=f"Gyroscope X: {gyro_x:.2f}")
+            self.sensor_labels["Gyroscope Y"].config(text=f"Gyroscope Y: {gyro_y:.2f}")
+            self.sensor_labels["Gyroscope Z"].config(text=f"Gyroscope Z: {gyro_z:.2f}")
+            
+            self.sensor_data["accel_x"].append(accel_x)
+            self.sensor_data["accel_y"].append(accel_y)
+            self.sensor_data["accel_z"].append(accel_z)
+            self.sensor_data["gyro_x"].append(gyro_x)
+            self.sensor_data["gyro_y"].append(gyro_y)
+            self.sensor_data["gyro_z"].append(gyro_z)
+            
+            max_length = 50
+            for key in self.sensor_data:
+                if len(self.sensor_data[key]) > max_length:
+                    self.sensor_data[key].pop(0)
+            
+            self.ax_accel.clear()
+            self.ax_accel.plot(self.sensor_data["accel_x"], label="Acceleration X", color="#1f77b4")
+            self.ax_accel.plot(self.sensor_data["accel_y"], label="Acceleration Y", color="#ff7f0e")
+            self.ax_accel.plot(self.sensor_data["accel_z"], label="Acceleration Z", color="#2ca02c")
+            self.ax_accel.legend(loc="upper left", fontsize=10)
+            self.ax_accel.grid(True)
+            
+            self.ax_gyro.clear()
+            self.ax_gyro.plot(self.sensor_data["gyro_x"], label="Gyroscope X", color="#d62728")
+            self.ax_gyro.plot(self.sensor_data["gyro_y"], label="Gyroscope Y", color="#9467bd")
+            self.ax_gyro.plot(self.sensor_data["gyro_z"], label="Gyroscope Z", color="#8c564b")
+            self.ax_gyro.legend(loc="upper left", fontsize=10)
+            self.ax_gyro.grid(True)
+            
+            self.canvas.draw()
+            logging.debug("Sensor data updated successfully.")
+            self.after(1000, self.update_sensor_data)
+        except Exception as e:
+            logging.error(f"Error updating sensor data: {e}")
+            messagebox.showerror("Sensor Error", f"Failed to update sensor data: {e}")
 
     def update_motor_stats(self):
-        motor = Motor()
-        self.motor_labels["Power"].config(text=f"Power: {motor.power:.2f} HP")
-        self.motor_labels["Torque"].config(text=f"Torque: {motor.torque:.2f} Nm")
-        self.motor_labels["Efficiency"].config(text=f"Efficiency: {motor.efficiency:.2f}%")
-        self.motor_labels["Weight"].config(text=f"Weight: {motor.weight:.2f} kg")
-        self.after(1000, self.update_motor_stats)
+        try:
+            motor = Motor()
+            self.motor_labels["Power"].config(text=f"Power: {motor.power:.2f} HP")
+            self.motor_labels["Torque"].config(text=f"Torque: {motor.torque:.2f} Nm")
+            self.motor_labels["Efficiency"].config(text=f"Efficiency: {motor.efficiency:.2f}%")
+            self.motor_labels["Weight"].config(text=f"Weight: {motor.weight:.2f} kg")
+            logging.debug("Motor stats updated successfully.")
+            self.after(1000, self.update_motor_stats)
+        except Exception as e:
+            logging.error(f"Error updating motor stats: {e}")
+            messagebox.showerror("Motor Error", f"Failed to update motor stats: {e}")
     
     def trigger_delay_charge(self):
-        self.request_authorization()
-        if self.is_authorized:
-            trigger_delay_charge()
+        try:
+            self.request_authorization()
+            if self.is_authorized:
+                trigger_delay_charge()
+                logging.info("Delay charge triggered successfully.")
+            else:
+                logging.warning("Unauthorized attempt to trigger delay charge.")
+        except Exception as e:
+            logging.error(f"Error triggering delay charge: {e}")
+            messagebox.showerror("Charge Error", f"Failed to trigger delay charge: {e}")
 
     def release_parachute(self):
-        self.request_authorization()
-        if self.is_authorized:
-            release_parachute()
+        try:
+            self.request_authorization()
+            if self.is_authorized:
+                release_parachute()
+                logging.info("Parachute released successfully.")
+            else:
+                logging.warning("Unauthorized attempt to release parachute.")
+        except Exception as e:
+            logging.error(f"Error releasing parachute: {e}")
+            messagebox.showerror("Parachute Error", f"Failed to release parachute: {e}")
 
     def request_authorization(self):
-        username = simpledialog.askstring("Authentication", "Enter Username:", parent=self)
-        password = simpledialog.askstring("Authentication", "Enter Password:", parent=self, show='*')
+        try:
+            username = simpledialog.askstring("Authentication", "Enter Username:", parent=self)
+            password = simpledialog.askstring("Authentication", "Enter Password:", parent=self, show='*')
 
-        if authenticate(username, password):
-            self.is_authorized = True
-        else:
-            self.is_authorized = False
-            messagebox.showerror("Authentication Failed", "Incorrect username or password")
+            if authenticate(username, password):
+                self.is_authorized = True
+                logging.info(f"User '{username}' authenticated successfully.")
+            else:
+                self.is_authorized = False
+                logging.warning(f"Failed authentication attempt for user '{username}'.")
+                messagebox.showerror("Authentication Failed", "Incorrect username or password")
+        except Exception as e:
+            logging.error(f"Error during authentication: {e}")
+            messagebox.showerror("Authentication Error", f"Failed to authenticate: {e}")
 
 
 if __name__ == "__main__":
@@ -163,5 +200,8 @@ if __name__ == "__main__":
     try:
         dashboard = SensorMotorDashboard()
         dashboard.mainloop()
+    except Exception as e:
+        logging.critical(f"Critical error: {e}")
     finally:
         cleanup_gpio()
+        logging.info("GPIO cleanup complete.")

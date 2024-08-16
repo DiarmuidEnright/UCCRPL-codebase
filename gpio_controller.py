@@ -1,24 +1,40 @@
+
 import RPi.GPIO as GPIO
 import time
+from exceptions import GPIOSetupError, MotorControlError
+from logging_config import logger
 
-IGNITION_PIN = 17
-MOTOR_PIN = 18
-PARACHUTE_PIN = 22
-DELAY_CHARGE_PIN = 27
+class GPIOController:
+    def __init__(self, ignition_pin=17, motor_pin=18):
+        try:
+            GPIO.setmode(GPIO.BCM)
+            GPIO.setup(ignition_pin, GPIO.OUT)
+            GPIO.setup(motor_pin, GPIO.OUT)
+            self.ignition_pin = ignition_pin
+            self.motor_pin = motor_pin
+            logger.info("GPIO setup completed successfully.")
+        except Exception as e:
+            logger.error(f"GPIO setup failed: {e}")
+            raise GPIOSetupError("Failed to set up GPIO pins.") from e
 
-def initialize_gpio():
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(IGNITION_PIN, GPIO.OUT)
-    GPIO.setup(MOTOR_PIN, GPIO.OUT)
-    GPIO.setup(PARACHUTE_PIN, GPIO.OUT)
-    GPIO.setup(DELAY_CHARGE_PIN, GPIO.OUT)
+    def trigger_ignition(self):
+        try:
+            logger.debug("Attempting to trigger ignition.")
+            GPIO.output(self.ignition_pin, GPIO.HIGH)
+            time.sleep(1)
+            GPIO.output(self.ignition_pin, GPIO.LOW)
+            logger.info("Ignition triggered successfully.")
+        except Exception as e:
+            logger.error(f"Failed to trigger ignition: {e}")
+            raise MotorControlError("Ignition trigger failed.") from e
 
-def trigger_delay_charge():
-    GPIO.output(DELAY_CHARGE_PIN, True)
-    time.sleep(2)
-    GPIO.output(DELAY_CHARGE_PIN, False)
-
-def release_parachute():
-    GPIO.output(PARACHUTE_PIN, True)
-    time.sleep(1)
-    GPIO.output(PARACHUTE_PIN, False)
+    def activate_motor(self):
+        try:
+            logger.debug("Attempting to activate motor.")
+            GPIO.output(self.motor_pin, GPIO.HIGH)
+            time.sleep(2)
+            GPIO.output(self.motor_pin, GPIO.LOW)
+            logger.info("Motor activated successfully.")
+        except Exception as e:
+            logger.error(f"Failed to activate motor: {e}")
+            raise MotorControlError("Motor activation failed.") from e

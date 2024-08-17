@@ -18,7 +18,7 @@ sd_card = adafruit_sdcard.SDCard(spi, cs)
 vfs = storage.VfsFat(sd_card)
 storage.mount(vfs, "/sd")
 
-log_file = open("/sd/log.txt", "a")
+log_file = open("sensor_logs.csv", "a")
 
 def log_data():
     temperature = bmp280.temperature

@@ -2,6 +2,7 @@
 Intial commit: Debugged files and waiting for approval of funds for parts
 Run app.py on pi for testing -- still needs to be debugged
 
+File functionality:
 main.py: Main entry point for the application.
 
 dashboard.py: Logic for the dashboard UI.

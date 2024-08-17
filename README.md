@@ -37,24 +37,31 @@ gps_reader.py: Processes GPS data.
 ai_decision_making.py: AI for real-time decision-making.
 
 sd_receiver.py: Receives telemetry data.
-sd_transmitter.py: Transmits telemetry data.
 
-data_logging/
-Stores sensor logs and data.
+sd_transmitter.py: Transmits telemetry data.
 
 sensor_logs.csv: Example file for logged sensor data.
 
 test_dashboard.py: Tests for the dashboard.
+
 test_gpio_controller.py: Tests for GPIO control.
+
 test_motor.py: Tests for motor control.
+
 test_sensor_data.py: Tests for sensor data handling.
+
 test_failsafe.py: Tests for failsafe functions.
+
 test_auth.py: Tests for authentication.
+
 test_autopilot.py: Tests for autopilot logic.
+
 test_parachute.py: Tests for parachute control.
+
 test_rth.py: Tests for Return-to-Home logic.
 
-
 setup.sh: Sets up the project environment.
+
 run_tests.sh: Runs all unit tests.
+
 deploy.sh: Deploys the application.

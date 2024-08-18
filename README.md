@@ -66,3 +66,5 @@ setup.sh: Sets up the project environment.
 run_tests.sh: Runs all unit tests.
 
 deploy.sh: Deploys the application.
+
+Forgot to do a commit today so this is gonna be it :333

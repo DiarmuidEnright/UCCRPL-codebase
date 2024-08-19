@@ -13,6 +13,7 @@ from motor import Motor
 from sensor_data import get_sensor_readings
 from failsafe import start_failsafe_monitoring
 from auth import authenticate
+from camera_capture import RocketCamera 
 
 logging.basicConfig(filename="rocket_dashboard.log", level=logging.DEBUG, 
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -88,6 +89,7 @@ class SensorMotorDashboard(tk.Tk):
         }
         
         self.grid_columnconfigure(1, weight=1)
+        self.rocket_camera = RocketCamera()
         
         try:
             self.update_sensor_data()
@@ -177,6 +179,10 @@ class SensorMotorDashboard(tk.Tk):
         except Exception as e:
             logging.error(f"Error releasing parachute: {e}")
             messagebox.showerror("Parachute Error", f"Failed to release parachute: {e}")
+    
+    def launch_rocket(self):
+        self.rocket_camera.start_recording(duration=120)
+
 
     def request_authorization(self):
         try:

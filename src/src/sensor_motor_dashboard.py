@@ -89,11 +89,12 @@ class SensorMotorDashboard(tk.Tk):
         }
         
         self.grid_columnconfigure(1, weight=1)
-        self.rocket_camera = RocketCamera()
+        
         
         try:
             self.update_sensor_data()
             self.update_motor_stats()
+            self.rocket_camera = RocketCamera()
             start_failsafe_monitoring()  # Start monitoring altitude for failsafe
             logging.info("Dashboard initialized successfully.")
         except Exception as e:

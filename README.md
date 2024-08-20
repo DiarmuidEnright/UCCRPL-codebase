@@ -7,6 +7,10 @@ main.py: Main entry point for the application.
 
 dashboard.py: Logic for the dashboard UI.
 
+camera_capture.py: Records and parses data with rasp pi
+
+camera_conversion.sh: Converts footage to mp4 for ease of access
+
 gpio_controller.py: Controls GPIO hardware interactions.
 
 motor.py: Manages motor operations and data.

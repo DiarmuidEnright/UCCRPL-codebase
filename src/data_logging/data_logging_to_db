@@ -1,0 +1,49 @@
+import sqlite3
+import time
+from sensor_data import get_sensor_readings
+
+class DataLogger:
+    def __init__(self, db_path='flight_data.db'):
+        self.conn = sqlite3.connect(db_path)
+        self.cursor = self.conn.cursor()
+
+    def log_sensor_data(self, flight_id, sensor_data):
+        timestamp = time.time()
+        query = """INSERT INTO sensor_data (flight_id, timestamp, altitude, speed, acceleration_x, acceleration_y, acceleration_z, gyro_x, gyro_y, gyro_z, temperature)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+        self.cursor.execute(query, (
+            flight_id,
+            timestamp,
+            sensor_data['altitude'],
+            sensor_data['speed'],
+            sensor_data['acceleration_x'],
+            sensor_data['acceleration_y'],
+            sensor_data['acceleration_z'],
+            sensor_data['gyro_x'],
+            sensor_data['gyro_y'],
+            sensor_data['gyro_z'],
+            sensor_data['temperature']
+        ))
+        self.conn.commit()
+
+    def log_event(self, flight_id, event_type, description):
+        timestamp = time.time()
+        query = """INSERT INTO events (flight_id, timestamp, event_type, description)
+                   VALUES (?, ?, ?, ?)"""
+        self.cursor.execute(query, (flight_id, timestamp, event_type, description))
+        self.conn.commit()
+
+    def close(self):
+        self.conn.close()
+
+if __name__ == "__main__":
+    logger = DataLogger()
+    flight_id = 1
+
+    try:
+        while True:
+            sensor_data = get_sensor_readings()
+            logger.log_sensor_data(flight_id, sensor_data)
+            time.sleep(1)
+    except KeyboardInterrupt:
+        logger.close()

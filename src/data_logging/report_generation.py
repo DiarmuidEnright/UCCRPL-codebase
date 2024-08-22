@@ -2,7 +2,6 @@ import sqlite3
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader
 import pdfkit
-'''
 
 class ReportGenerator:
     def __init__(self, db_path='flight_data.db'):
@@ -16,8 +15,9 @@ class ReportGenerator:
         pdfkit.from_string(html_report, f'flight_{flight_id}_report.pdf')
 
     def close(self):
+        self.conn.close()
 
-
-'''
-
-#Finish tomorrow
+if __name__ == "__main__":
+    report_gen = ReportGenerator()
+    report_gen.generate_report(1)
+    report_gen.close()

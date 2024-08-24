@@ -1,13 +1,16 @@
 import hashlib
+import json
 from typing import Dict
-
-AUTHORIZED_USERS: Dict[str, str] = {
-    "admin": "5f4dcc3b5aa765d61d8327deb882cf99"  # This is 'password' in MD5
-}
 
 def hash_password(password: str) -> str:
     return hashlib.md5(password.encode()).hexdigest()
 
 def authenticate(username: str, password: str) -> bool:
-    hashed_password: str = hash_password(password)
+    hashed_password = hash_password(password)
     return username in AUTHORIZED_USERS and AUTHORIZED_USERS[username] == hashed_password
+
+def load_authorized_users(filepath: str) -> Dict[str, str]:
+    with open(filepath, 'r') as file:
+        return json.load(file)
+
+AUTHORIZED_USERS = load_authorized_users('config.json')

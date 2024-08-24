@@ -1,6 +1,7 @@
 import sqlite3
 import pandas as pd
 import matplotlib.pyplot as plt
+from typing import List, Tuple
 
 class DataAnalyzer:
     def __init__(self, db_path: str = 'flight_data.db') -> None:
@@ -11,35 +12,29 @@ class DataAnalyzer:
         df: pd.DataFrame = pd.read_sql_query(query, self.conn, params=(flight_id,))
         return df
 
+    def _plot_metric(self, df: pd.DataFrame, column: str, ylabel: str, title: str, subplot_position: Tuple[int, int]) -> None:
+        plt.subplot(*subplot_position)
+        plt.plot(df['timestamp'], df[column], label=column)
+        plt.xlabel('Time')
+        plt.ylabel(ylabel)
+        plt.title(title)
+        plt.legend()
+
     def plot_flight_data(self, flight_id: int) -> None:
         df: pd.DataFrame = self.get_flight_data(flight_id)
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
-        
+
         plt.figure(figsize=(14, 7))
 
-        plt.subplot(2, 2, 1)
-        plt.plot(df['timestamp'], df['altitude'], label="Altitude")
-        plt.xlabel('Time')
-        plt.ylabel('Altitude (m)')
-        plt.title('Altitude Over Time')
+        metrics: List[Tuple[str, str, str, Tuple[int, int]]] = [
+            ('altitude', 'Altitude (m)', 'Altitude Over Time', (2, 2, 1)),
+            ('speed', 'Speed (m/s)', 'Speed Over Time', (2, 2, 2)),
+            ('acceleration', 'Acceleration (m/s²)', 'Acceleration Over Time', (2, 2, 3)),
+            ('pressure', 'Pressure (Pa)', 'Pressure Over Time', (2, 2, 4))
+        ]
 
-        plt.subplot(2, 2, 2)
-        plt.plot(df['timestamp'], df['speed'], label="Speed")
-        plt.xlabel('Time')
-        plt.ylabel('Speed (m/s)')
-        plt.title('Speed Over Time')
-
-        plt.subplot(2, 2, 3)
-        plt.plot(df['timestamp'], df['acceleration'], label="Acceleration")
-        plt.xlabel('Time')
-        plt.ylabel('Acceleration (m/s²)')
-        plt.title('Acceleration Over Time')
-
-        plt.subplot(2, 2, 4)
-        plt.plot(df['timestamp'], df['pressure'], label="Pressure")
-        plt.xlabel('Time')
-        plt.ylabel('Pressure (Pa)')
-        plt.title('Pressure Over Time')
+        for column, ylabel, title, position in metrics:
+            self._plot_metric(df, column, ylabel, title, position)
 
         plt.tight_layout()
         plt.show()

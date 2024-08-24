@@ -1,6 +1,8 @@
 import serial
 import time
-import webbrowser
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import tkinter as tk
 from typing import Optional, Dict
 
 class GPSTracker:
@@ -29,39 +31,51 @@ class GPSTracker:
     def get_location(self) -> Dict[str, Optional[float]]:
         return self.last_known_position
 
-    def generate_google_maps_url(self) -> Optional[str]:
-        lat = self.last_known_position["latitude"]
-        lon = self.last_known_position["longitude"]
-        if lat is not None and lon is not None:
-            return f"https://www.google.com/maps?q={lat},{lon}"
-        return None
-
-    def open_google_maps(self) -> None:
-        url = self.generate_google_maps_url()
-        if url:
-            webbrowser.open(url)
-        else:
-            print("No location data available to open in Google Maps.")
-
-    def read_gps(self) -> None:
-        while True:
-            line = self.ser.readline().decode('ascii', errors='replace')
-            self.parse_gps_data(line)
-            time.sleep(1)
-
     def stop(self) -> None:
         self.ser.close()
 
-if __name__ == "__main__":
+class GPSPlotter(tk.Tk):
+    def __init__(self, gps_tracker: GPSTracker) -> None:
+        super().__init__()
+        self.gps_tracker = gps_tracker
+        self.title("GPS Tracker")
+        
+        self.fig, self.ax = plt.subplots(figsize=(5, 4), dpi=100)
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
+        self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        
+        self.ax.set_title("GPS Location")
+        self.ax.set_xlabel("Longitude")
+        self.ax.set_ylabel("Latitude")
+        
+        self.update_plot()
+
+    def update_plot(self) -> None:
+        location = self.gps_tracker.get_location()
+        lat = location["latitude"]
+        lon = location["longitude"]
+
+        self.ax.clear()
+        self.ax.set_title("GPS Location")
+        self.ax.set_xlabel("Longitude")
+        self.ax.set_ylabel("Latitude")
+        if lat is not None and lon is not None:
+            self.ax.plot(lon, lat, 'ro')
+        
+        self.canvas.draw()
+        
+        self.after(1000, self.update_plot)
+
+def main():
     gps_tracker = GPSTracker()
+    app = GPSPlotter(gps_tracker)
     try:
         print("GPS Tracker started. Press Ctrl+C to stop.")
-        while True:
-            location = gps_tracker.get_location()
-            print(f"Current Location: Latitude: {location['latitude']}, Longitude: {location['longitude']}")
-            gps_tracker.open_google_maps()
-            time.sleep(30)
+        app.mainloop()
     except KeyboardInterrupt:
         print("GPS Tracker stopped.")
     finally:
         gps_tracker.stop()
+
+if __name__ == "__main__":
+    main()

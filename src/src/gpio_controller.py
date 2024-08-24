@@ -2,7 +2,6 @@ import RPi.GPIO as GPIO
 import time
 from exceptions import GPIOSetupError, MotorControlError
 from logging_config import logger
-from typing import Optional
 
 class GPIOController:
     def __init__(self, ignition_pin: int = 17, motor_pin: int = 18) -> None:

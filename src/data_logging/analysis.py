@@ -1,7 +1,6 @@
 import sqlite3
 import pandas as pd
 import matplotlib.pyplot as plt
-from typing import Optional
 
 class DataAnalyzer:
     def __init__(self, db_path: str = 'flight_data.db') -> None:

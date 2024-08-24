@@ -1,7 +1,6 @@
 from line_profiler import LineProfiler
 from sensor_motor_dashboard import SensorMotorDashboard
 from sensor_data import process_sensor_data
-from typing import Any
 
 def main() -> None:
     dashboard: SensorMotorDashboard = SensorMotorDashboard()

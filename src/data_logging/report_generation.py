@@ -2,7 +2,6 @@ import sqlite3
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader, Template
 import pdfkit
-from typing import Any
 
 class ReportGenerator:
     def __init__(self, db_path: str = 'flight_data.db') -> None:

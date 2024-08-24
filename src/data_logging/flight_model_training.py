@@ -3,7 +3,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import pandas as pd
 import sqlite3
-from typing import Any
 
 class FlightPredictor:
     def __init__(self, db_path: str = 'flight_data.db') -> None:

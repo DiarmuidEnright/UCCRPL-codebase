@@ -1,4 +1,4 @@
-
+from typing import Optional
 
 class RocketError(Exception):
     """Base class for exceptions in this rocket system."""

@@ -1,11 +1,11 @@
 import RPi.GPIO as GPIO
 import time
 
-RF_PIN = 17
+RF_PIN: int = 17
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(RF_PIN, GPIO.OUT)
 
-def send_data(data):
+def send_data(data: str) -> None:
     GPIO.output(RF_PIN, GPIO.HIGH)
     time.sleep(0.01)
     GPIO.output(RF_PIN, GPIO.LOW)

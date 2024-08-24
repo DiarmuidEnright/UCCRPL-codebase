@@ -1,11 +1,12 @@
 import unittest
 import sqlite3
 from analysis import DataAnalyzer
+from pandas import DataFrame
 
 class TestDataAnalyzer(unittest.TestCase):
-    def setUp(self):
-        self.db_path = ":memory:"
-        self.analyzer = DataAnalyzer(db_path=self.db_path)
+    def setUp(self) -> None:
+        self.db_path: str = ":memory:"
+        self.analyzer: DataAnalyzer = DataAnalyzer(db_path=self.db_path)
         self.analyzer.cursor.execute("""
         CREATE TABLE sensor_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,12 +28,12 @@ class TestDataAnalyzer(unittest.TestCase):
         VALUES (1, strftime('%s','now'), 1000, 300, 9.8, 0, 0, 0.1, 0.2, 0.3, 25)""")
         self.analyzer.conn.commit()
 
-    def test_get_flight_data(self):
-        df = self.analyzer.get_flight_data(1)
+    def test_get_flight_data(self) -> None:
+        df: DataFrame = self.analyzer.get_flight_data(1)
         self.assertEqual(len(df), 1)
         self.assertEqual(df['altitude'][0], 1000)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         self.analyzer.close()
 
 if __name__ == '__main__':

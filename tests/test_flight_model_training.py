@@ -1,9 +1,10 @@
 import unittest
 import sqlite3
 from flight_model_training import FlightPredictor
+import pandas as pd
 
 class TestFlightPredictor(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.db_path = ":memory:"
         self.predictor = FlightPredictor(db_path=self.db_path)
         self.predictor.cursor.execute("""
@@ -30,18 +31,18 @@ class TestFlightPredictor(unittest.TestCase):
         VALUES (1, strftime('%s','now'), 400, 50, 0.5, 0.5, 0.5, 0.05, 0.1, 0.15, 23)""")
         self.predictor.conn.commit()
 
-    def test_load_data(self):
-        df = self.predictor.load_data()
+    def test_load_data(self) -> None:
+        df: pd.DataFrame = self.predictor.load_data()
         self.assertEqual(len(df), 2)
         self.assertIn('altitude', df.columns)
         self.assertIn('speed', df.columns)
 
-    def test_train_model(self):
-        df = self.predictor.load_data()
+    def test_train_model(self) -> None:
+        self.predictor.load_data()
         self.predictor.train_model()
         self.assertTrue(True)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         self.predictor.close()
 
 if __name__ == '__main__':

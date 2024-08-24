@@ -1,18 +1,16 @@
-from flask import Flask, request
-from gpio_controller import initialize_gpio
+from flask import Flask, request, jsonify
+from gpio_controller import initialize_gpio, turn_on_ignition, turn_on_motor
 from sensor_motor_dashboard import SensorMotorDashboard
 from parachute_controller import initialize_parachute, release_parachute, check_and_release_parachute
 from iot_client import IoTClient, iot_callback
-from autopilot import Autopilot
-from rth import ReturnToHome
-from ai_decision_making import AIDecisionMaking
-from parachute_controller import ParachuteController
-from delay_charge_controller import DelayChargeController
+from typing import Optional, Dict, Any
 import time
 
 app = Flask(__name__)
 
-def initialize_iot():
+iot_client: Optional[IoTClient] = None
+
+def initialize_iot() -> None:
     global iot_client
     iot_client = IoTClient(
         client_id="rocketClient",
@@ -26,34 +24,34 @@ def initialize_iot():
 
 
 @app.route('/launch', methods=['POST'])
-def launch():
-    from gpio_controller import turn_on_ignition, turn_on_motor
+def launch() -> Any:
+    countdown: Optional[int] = request.json.get('countdown')
     
-    countdown = request.json.get('countdown')
     if countdown is None or countdown <= 0:
-        return "Invalid countdown time. Please enter a positive number.", 400
+        return jsonify({"error": "Invalid countdown time. Please enter a positive number."}), 400
 
     print(f"Countdown started: {countdown} seconds")
     time.sleep(countdown)
     turn_on_ignition()
     turn_on_motor()
-    return f"Rocket launched after {countdown} seconds!", 200
+    return jsonify({"message": f"Rocket launched after {countdown} seconds!"}), 200
 
 @app.route('/release_parachute', methods=['POST'])
-def manual_parachute_release():
+def manual_parachute_release() -> Any:
     release_parachute()
-    return "Parachute released!", 200
+    return jsonify({"message": "Parachute released!"}), 200
 
 @app.route('/altitude_check', methods=['POST'])
-def altitude_check():
-    altitude = request.json.get('altitude')
-    threshold = request.json.get('threshold', 1000)
+def altitude_check() -> Any:
+    data: Dict[str, Any] = request.json
+    altitude: Optional[int] = data.get('altitude')
+    threshold: int = data.get('threshold', 1000)
     
     if altitude is None:
-        return "Altitude data missing.", 400
+        return jsonify({"error": "Altitude data missing."}), 400
     
     check_and_release_parachute(altitude, threshold)
-    return f"Altitude checked: {altitude} meters.", 200
+    return jsonify({"message": f"Altitude checked: {altitude} meters."}), 200
 
 if __name__ == "__main__":
     initialize_iot()

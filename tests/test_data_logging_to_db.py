@@ -3,7 +3,8 @@ import sqlite3
 from data_logging_to_db import DataLogger
 
 class TestDataLogger(unittest.TestCase):
-    def setUp(self):
+
+    def setUp(self) -> None:
         self.db_path = ":memory:"
         self.logger = DataLogger(db_path=self.db_path)
         self.flight_id = 1
@@ -24,7 +25,7 @@ class TestDataLogger(unittest.TestCase):
         )""")
         self.logger.conn.commit()
 
-    def test_log_sensor_data(self):
+    def test_log_sensor_data(self) -> None:
         sensor_data = {
             'altitude': 1000.0,
             'speed': 300.0,
@@ -44,7 +45,7 @@ class TestDataLogger(unittest.TestCase):
         self.assertAlmostEqual(row[3], sensor_data['altitude'])
         self.assertAlmostEqual(row[4], sensor_data['speed'])
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         self.logger.close()
 
 if __name__ == '__main__':

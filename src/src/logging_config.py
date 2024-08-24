@@ -1,7 +1,7 @@
-
 import logging
+from typing import Any
 
-def setup_logging():
+def setup_logging() -> logging.Logger:
     logging.basicConfig(
         level=logging.DEBUG,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -10,7 +10,7 @@ def setup_logging():
             logging.StreamHandler()
         ]
     )
-    logger = logging.getLogger(__name__)
+    logger: logging.Logger = logging.getLogger(__name__)
     return logger
 
-logger = setup_logging()
+logger: logging.Logger = setup_logging()

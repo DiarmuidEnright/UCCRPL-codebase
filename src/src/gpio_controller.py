@@ -1,23 +1,23 @@
-
 import RPi.GPIO as GPIO
 import time
 from exceptions import GPIOSetupError, MotorControlError
 from logging_config import logger
+from typing import Optional
 
 class GPIOController:
-    def __init__(self, ignition_pin=17, motor_pin=18):
+    def __init__(self, ignition_pin: int = 17, motor_pin: int = 18) -> None:
         try:
             GPIO.setmode(GPIO.BCM)
             GPIO.setup(ignition_pin, GPIO.OUT)
             GPIO.setup(motor_pin, GPIO.OUT)
-            self.ignition_pin = ignition_pin
-            self.motor_pin = motor_pin
+            self.ignition_pin: int = ignition_pin
+            self.motor_pin: int = motor_pin
             logger.info("GPIO setup completed successfully.")
         except Exception as e:
             logger.error(f"GPIO setup failed: {e}")
             raise GPIOSetupError("Failed to set up GPIO pins.") from e
 
-    def trigger_ignition(self):
+    def trigger_ignition(self) -> None:
         try:
             logger.debug("Attempting to trigger ignition.")
             GPIO.output(self.ignition_pin, GPIO.HIGH)
@@ -28,7 +28,7 @@ class GPIOController:
             logger.error(f"Failed to trigger ignition: {e}")
             raise MotorControlError("Ignition trigger failed.") from e
 
-    def activate_motor(self):
+    def activate_motor(self) -> None:
         try:
             logger.debug("Attempting to activate motor.")
             GPIO.output(self.motor_pin, GPIO.HIGH)

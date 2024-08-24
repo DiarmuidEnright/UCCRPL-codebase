@@ -4,7 +4,7 @@ from parachute_controller import ParachuteController
 
 class TestParachuteController(unittest.TestCase):
     @patch('RPi.GPIO.output')
-    def test_release_parachute(self, mock_output):
+    def test_release_parachute(self, mock_output: unittest.mock.MagicMock) -> None:
         controller = ParachuteController(17)
         controller.release_parachute()
         self.assertEqual(mock_output.call_count, 2)

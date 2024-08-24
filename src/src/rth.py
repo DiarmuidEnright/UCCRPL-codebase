@@ -1,10 +1,12 @@
-class ReturnToHome:
-    def __init__(self, home_coordinates):
-        self.home_coordinates = home_coordinates
+from typing import Tuple
 
-    def calculate_vector(self, current_coordinates):
+class ReturnToHome:
+    def __init__(self, home_coordinates: Tuple[float, float]) -> None:
+        self.home_coordinates: Tuple[float, float] = home_coordinates
+
+    def calculate_vector(self, current_coordinates: Tuple[float, float]) -> Tuple[float, float]: 
         pass
 
-    def execute(self, current_coordinates):
-        vector = self.calculate_vector(current_coordinates)
+    def execute(self, current_coordinates: Tuple[float, float]) -> None:
+        vector: Tuple[float, float] = self.calculate_vector(current_coordinates)
         pass

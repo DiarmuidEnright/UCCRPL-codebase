@@ -13,36 +13,36 @@ from motor import Motor
 from sensor_data import get_sensor_readings
 from failsafe import start_failsafe_monitoring
 from auth import authenticate
-from camera_capture import RocketCamera 
+from camera_capture import RocketCamera
 
 logging.basicConfig(filename="rocket_dashboard.log", level=logging.DEBUG, 
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 class SensorMotorDashboard(tk.Tk):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.title("Rocket Dashboard")
         self.geometry("1200x600")
         
-        self.bg_color = "#221a0e"
-        self.fg_color = "#d4d4d4"
-        self.accent_color = "#569cd6"
+        self.bg_color: str = "#221a0e"
+        self.fg_color: str = "#d4d4d4"
+        self.accent_color: str = "#569cd6"
         
         self.configure(bg=self.bg_color)
         
-        self.default_font = ("Menlo", 14)
+        self.default_font: tuple[str, int] = ("Menlo", 14)
 
-        self.sensor_frame = ttk.LabelFrame(self, text="Sensor Data", padding=(10, 5))
+        self.sensor_frame: ttk.LabelFrame = ttk.LabelFrame(self, text="Sensor Data", padding=(10, 5))
         self.sensor_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-        self.motor_frame = ttk.LabelFrame(self, text="Motor Information", padding=(10, 5))
+        self.motor_frame: ttk.LabelFrame = ttk.LabelFrame(self, text="Motor Information", padding=(10, 5))
         self.motor_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
         
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
         
-        self.sensor_labels = {
+        self.sensor_labels: dict[str, tk.Label] = {
             "Acceleration X": tk.Label(self.sensor_frame, text="Acceleration X: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
             "Acceleration Y": tk.Label(self.sensor_frame, text="Acceleration Y: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
             "Acceleration Z": tk.Label(self.sensor_frame, text="Acceleration Z: 0", bg="#403C3C", fg=self.fg_color, font=self.default_font),
@@ -54,7 +54,7 @@ class SensorMotorDashboard(tk.Tk):
         for index, (label_text, label_widget) in enumerate(self.sensor_labels.items()):
             label_widget.grid(row=index, column=0, sticky="w")
         
-        self.motor_labels = {
+        self.motor_labels: dict[str, tk.Label] = {
             "Power": tk.Label(self.motor_frame, text="Power: 0 HP", bg="#403C3C", fg=self.fg_color, font=self.default_font),
             "Torque": tk.Label(self.motor_frame, text="Torque: 0 Nm", bg="#403C3C", fg=self.fg_color, font=self.default_font),
             "Efficiency": tk.Label(self.motor_frame, text="Efficiency: 0%", bg="#403C3C", fg=self.fg_color, font=self.default_font),
@@ -64,7 +64,7 @@ class SensorMotorDashboard(tk.Tk):
         for index, (label_text, label_widget) in enumerate(self.motor_labels.items()):
             label_widget.grid(row=index, column=0, sticky="w")
         
-        self.figure = Figure(figsize=(8, 6), dpi=100, facecolor=self.bg_color)
+        self.figure: Figure = Figure(figsize=(8, 6), dpi=100, facecolor=self.bg_color)
         self.ax_accel = self.figure.add_subplot(211, facecolor=self.bg_color)
         self.ax_gyro = self.figure.add_subplot(212, facecolor=self.bg_color)
         
@@ -76,10 +76,10 @@ class SensorMotorDashboard(tk.Tk):
         self.ax_gyro.set_xlabel("Time", color=self.fg_color, fontsize=12, fontname="Menlo")
         self.ax_gyro.set_ylabel("Angular Velocity (deg/s)", color=self.fg_color, fontsize=12, fontname="Menlo")
         
-        self.canvas = FigureCanvasTkAgg(self.figure, master=self)
+        self.canvas: FigureCanvasTkAgg = FigureCanvasTkAgg(self.figure, master=self)
         self.canvas.get_tk_widget().grid(row=0, column=1, rowspan=2, padx=10, pady=10, sticky="nsew")
         
-        self.sensor_data = {
+        self.sensor_data: dict[str, list[float]] = {
             "accel_x": [],
             "accel_y": [],
             "accel_z": [],
@@ -90,18 +90,19 @@ class SensorMotorDashboard(tk.Tk):
         
         self.grid_columnconfigure(1, weight=1)
         
+        self.is_authorized: bool = False
         
         try:
             self.update_sensor_data()
             self.update_motor_stats()
-            self.rocket_camera = RocketCamera()
-            start_failsafe_monitoring()  # Start monitoring altitude for failsafe
+            self.rocket_camera: RocketCamera = RocketCamera()
+            start_failsafe_monitoring()
             logging.info("Dashboard initialized successfully.")
         except Exception as e:
             logging.error(f"Error initializing dashboard: {e}")
             messagebox.showerror("Initialization Error", f"Failed to initialize the dashboard: {e}")
 
-    def update_sensor_data(self):
+    def update_sensor_data(self) -> None:
         try:
             accel_x, accel_y, accel_z, gyro_x, gyro_y, gyro_z = get_sensor_readings()
             self.sensor_labels["Acceleration X"].config(text=f"Acceleration X: {accel_x:.2f}")
@@ -144,20 +145,20 @@ class SensorMotorDashboard(tk.Tk):
             logging.error(f"Error updating sensor data: {e}")
             messagebox.showerror("Sensor Error", f"Failed to update sensor data: {e}")
 
-    def update_motor_stats(self):
+    def update_motor_stats(self) -> None:
         try:
             motor = Motor()
-            self.motor_labels["Power"].config(text=f"Power: {motor.power:.2f} HP")
-            self.motor_labels["Torque"].config(text=f"Torque: {motor.torque:.2f} Nm")
-            self.motor_labels["Efficiency"].config(text=f"Efficiency: {motor.efficiency:.2f}%")
-            self.motor_labels["Weight"].config(text=f"Weight: {motor.weight:.2f} kg")
+            self.motor_labels["Power"].config(text=f"Power: {motor.power_hp:.2f} HP")
+            self.motor_labels["Torque"].config(text=f"Torque: {motor.torque_nm:.2f} Nm")
+            self.motor_labels["Efficiency"].config(text=f"Efficiency: {motor.efficiency_percent:.2f}%")
+            self.motor_labels["Weight"].config(text=f"Weight: {motor.weight_kg:.2f} kg")
             logging.debug("Motor stats updated successfully.")
             self.after(1000, self.update_motor_stats)
         except Exception as e:
             logging.error(f"Error updating motor stats: {e}")
             messagebox.showerror("Motor Error", f"Failed to update motor stats: {e}")
-    
-    def trigger_delay_charge(self):
+
+    def trigger_delay_charge(self) -> None:
         try:
             self.request_authorization()
             if self.is_authorized:
@@ -169,7 +170,7 @@ class SensorMotorDashboard(tk.Tk):
             logging.error(f"Error triggering delay charge: {e}")
             messagebox.showerror("Charge Error", f"Failed to trigger delay charge: {e}")
 
-    def release_parachute(self):
+    def release_parachute(self) -> None:
         try:
             self.request_authorization()
             if self.is_authorized:
@@ -180,15 +181,14 @@ class SensorMotorDashboard(tk.Tk):
         except Exception as e:
             logging.error(f"Error releasing parachute: {e}")
             messagebox.showerror("Parachute Error", f"Failed to release parachute: {e}")
-    
-    def launch_rocket(self):
+
+    def launch_rocket(self) -> None:
         self.rocket_camera.start_recording(duration=120)
 
-
-    def request_authorization(self):
+    def request_authorization(self) -> None:
         try:
-            username = simpledialog.askstring("Authentication", "Enter Username:", parent=self)
-            password = simpledialog.askstring("Authentication", "Enter Password:", parent=self, show='*')
+            username: str = simpledialog.askstring("Authentication", "Enter Username:", parent=self)
+            password: str = simpledialog.askstring("Authentication", "Enter Password:", parent=self, show='*')
 
             if authenticate(username, password):
                 self.is_authorized = True
@@ -200,7 +200,6 @@ class SensorMotorDashboard(tk.Tk):
         except Exception as e:
             logging.error(f"Error during authentication: {e}")
             messagebox.showerror("Authentication Error", f"Failed to authenticate: {e}")
-
 
 if __name__ == "__main__":
     initialize_gpio()

@@ -1,4 +1,4 @@
-CREATE TABLE flights (
+CREATE TABLE flight_data (
     flight_id INTEGER PRIMARY KEY AUTOINCREMENT,
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     mission_name TEXT,

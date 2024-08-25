@@ -1,14 +1,14 @@
-#failsafe
+#failsafe.py
 ALTITUDE_THRESHOLD = 1000  # meters
 CHECK_INTERVAL = 1  # seconds
 
-# camera_capture
+# camera_capture.py
 CAMERA_RESOLUTION = (1920, 1080)
 CAMERA_FRAMERATE = 30
 OUTPUT_DIR = "rocket_footage"
 RECORDING_DURATION = 60
 
-# flight model training
+# flight_model_training.py
 TEST_SIZE = 0.2 
 RANDOM_STATE = 42
 

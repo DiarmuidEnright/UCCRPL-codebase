@@ -2,17 +2,18 @@ from picamera import PiCamera
 from time import sleep
 import os
 from typing import Optional
+from settings import CAMERA_RESOLUTION, CAMERA_FRAMERATE, OUTPUT_DIR, RECORDING_DURATION
 
 class RocketCamera:
     def __init__(self) -> None:
         self.camera: PiCamera = PiCamera()
-        self.camera.resolution = (1920, 1080)
-        self.camera.framerate = 30
-        self.output_dir: str = "rocket_footage"
+        self.camera.resolution = CAMERA_RESOLUTION
+        self.camera.framerate = CAMERA_FRAMERATE
+        self.output_dir: str = OUTPUT_DIR
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 
-    def start_recording(self, duration: Optional[int] = 60) -> None:
+    def start_recording(self, duration: Optional[int] = RECORDING_DURATION) -> None:
         try:
             file_path: str = os.path.join(self.output_dir, "launch_footage.h264")
             self.camera.start_recording(file_path)

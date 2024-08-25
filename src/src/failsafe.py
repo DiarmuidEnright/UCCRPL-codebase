@@ -3,9 +3,7 @@ from threading import Thread
 from sensor_data import get_altitude
 from gpio_controller import release_parachute
 from typing import NoReturn
-
-ALTITUDE_THRESHOLD: int = 1000
-CHECK_INTERVAL: int = 1
+from settings import ALTITUDE_THRESHOLD, CHECK_INTERVAL
 
 def monitor_altitude() -> NoReturn:
     while True:

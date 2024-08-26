@@ -13,10 +13,10 @@ RUN apt-get update && apt-get install -y \
     gpsd-clients \
     gpsd \
     wkhtmltopdf \
-    git \  # Added git for cloning the repository
+    git \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /src/src/controllers/
+WORKDIR /src
 
 RUN git clone https://github.com/GyroOW/rocket_code.git .
 

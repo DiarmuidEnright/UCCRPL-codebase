@@ -16,15 +16,15 @@ RUN apt-get update && apt-get install -y \
     wkhtmltopdf \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /src/src/controllers/
 
-COPY . /app
+COPY . /src/src/controllers/gpio_controller.py
 
-COPY requirements.txt /app/
+COPY requirements.txt /src/src/controllers/
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 
 # EXPOSE 5000 (flask port)
 
-CMD ["python", "-"] # Setup tomorrow
+CMD ["python", "gpio_controller"] # sample tesr

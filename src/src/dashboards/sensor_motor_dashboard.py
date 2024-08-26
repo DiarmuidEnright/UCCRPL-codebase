@@ -1,7 +1,5 @@
 import tkinter as tk
 from tkinter import ttk, simpledialog, messagebox
-import time
-import random
 from threading import Thread
 from flask import Flask, request
 import RPi.GPIO as GPIO

@@ -23,7 +23,6 @@ RUN git clone https://github.com/GyroOW/rocket_code.git .
 COPY requirements.txt /src
 
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
 
 # EXPOSE 5000 (flask port)
 

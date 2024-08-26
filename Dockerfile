@@ -16,11 +16,12 @@ RUN apt-get update && apt-get install -y \
     git \  # Added git for cloning the repository
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /src/src/controllers/
+WORKDIR /app/src/src/controllers/
 
 RUN git clone https://github.com/GyroOW/rocket_code.git .
 
 COPY requirements.txt /src
+COPY src /app/src
 
 RUN pip install --upgrade pip
 

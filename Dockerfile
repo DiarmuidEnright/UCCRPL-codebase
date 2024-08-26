@@ -16,15 +16,13 @@ RUN apt-get update && apt-get install -y \
     git \  # Added git for cloning the repository
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app/src/src/controllers/
-
+WORKDIR /app
 RUN git clone https://github.com/GyroOW/rocket_code.git .
 
-COPY requirements.txt /src
-COPY src /app/src
+COPY requirements.txt /app
 
 RUN pip install --upgrade pip
 
 # EXPOSE 5000 (flask port)
 
-CMD ["python", "gpio_controller.py"]
+CMD ["python", "rocket_1.py"]

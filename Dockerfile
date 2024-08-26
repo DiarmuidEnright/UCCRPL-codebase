@@ -27,4 +27,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # EXPOSE 5000 (flask port)
 
-CMD ["python", "-"]
+CMD ["python", "-"] # Setup tomorrow

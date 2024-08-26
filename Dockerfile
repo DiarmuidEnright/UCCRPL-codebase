@@ -1,5 +1,4 @@
 FROM python:3.11-slim
-
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
@@ -14,17 +13,18 @@ RUN apt-get update && apt-get install -y \
     gpsd-clients \
     gpsd \
     wkhtmltopdf \
+    git \  # Added git for cloning the repository
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src/src/controllers/
 
-COPY . /src/src/controllers/gpio_controller.py
+RUN git clone https://github.com/GyroOW/rocket_code.git .
 
-COPY requirements.txt /src/src/controllers/
+COPY requirements.txt /src
+
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-
 # EXPOSE 5000 (flask port)
 
-CMD ["python", "gpio_controller"] # sample tesr
+CMD ["python", "gpio_controller.py"]

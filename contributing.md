@@ -21,7 +21,7 @@ We're thrilled that you're interested in contributing to our project! Whether yo
    ```bash
    git checkout -b your-branch-name
 
-    Choose a descriptive name for your branch that reflects the feature or fix you're working on.
+Choose a descriptive name for your branch that reflects the feature or fix you're working on.
 
 4. **Make Your Changes**:
     Now you're ready to make your changes. Here are a few tips to keep in mind:
@@ -35,13 +35,13 @@ We're thrilled that you're interested in contributing to our project! Whether yo
    git add .
    git commit -m "A brief description of your changes"
 
-    Once your changes are ready, commit them to your branch.
-    Please write clear and concise commit messages. If your changes fix an issue, mention it in the commit message (e.g., Fixes #123).
+Once your changes are ready, commit them to your branch.
+Please write clear and concise commit messages. If your changes fix an issue, mention it in the commit message (e.g., Fixes #123).
 
 6. **Push to Your Fork**:
    ```bash
    git push origin your-branch-name
-    Push your branch to your forked repository:
+Push your branch to your forked repository:
 
 7. **Submit a Pull Request**:
     Once your branch is pushed to GitHub, you're ready to create a Pull Request:

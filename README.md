@@ -1,74 +1,104 @@
-# rocket_-code_1
-Intial commit: Debugged files and waiting for approval of funds for parts
-Run app.py on pi for testing -- still needs to be debugged
+# Rocket Telemetry and Control System
 
-File functionality:
-main.py: Main entry point for the application.
+## Welcome!
+This repo is all about building a comprehensive telemetry and control system for UCC rocket propulsion lab's current and future projects.
+## Project Structure
 
-dashboard.py: Logic for the dashboard UI.
+### 1. `data_logging`
+- **`analysis.py`**: Analyze the data we’ve logged.
+- **`data_logging_to_db.py`**: Directly logs data into our database.
+- **`data_logging.py`**: The main script for data logging during flights.
+- **`database_setup.sql`**: Sets up the database for storing flight data.
+- **`flight_data.db`**: Our database file containing all the flight data.
+- **`flight_model_training.py`**: Trains models based on flight data.
+- **`logging_config.py`**: Configures how we log all our data.
+- **`report_generation.py`**: Generates reports from the flight data.
+- **`sensor_logs.csv`**: CSV file with all the raw sensor logs.
 
-camera_capture.py: Records and parses data with rasp pi
+### 2. `profiling`
+- **`line_profiler_script.py`**: Profiles the time taken by each line of code.
+- **`memory_profiler_script.py`**: Keeps an eye on memory usage.
+- **`profiler_main.py`**: The main script for running profiles.
+- **`py_spy_profiling.sh`**: A handy shell script for using `py-spy` to profile.
 
-camera_conversion.sh: Converts footage to mp4 for ease of access
+### 3. `scripts`
+- **`deploy.sh`**: For deploying the system.
+- **`run_tests.sh`**: Runs all our tests to make sure everything is working.
+- **`setup.sh`**: Sets up the environment for development.
 
-gpio_controller.py: Controls GPIO hardware interactions.
+### 4. `camera_content`
+- **`camera_capture.py`**: Captures images or video during flight.
+- **`camera_conversion.sh`**: Converts the captured media into the right format.
 
-motor.py: Manages motor operations and data.
+### 5. `controllers`
+- **`bmp280_reader.py`**: Reads atmospheric pressure from the BMP280 sensor.
+- **`failsafe.py`**: Implements safety mechanisms in case something goes wrong.
+- **`gpio_controller.py`**: Controls the GPIO pins.
+- **`gps_reader.py`**: Gets GPS data to know where we are.
+- **`i2c_controller.py`**: Handles I2C communication with sensors.
+- **`iot_client.py`**: Manages IoT connectivity, keeping us connected.
+- **`motor.py`**: Controls the rocket's motors.
+- **`mpu6050_reader.py`**: Reads motion data from the MPU6050 sensor.
+- **`parachute_controller.py`**: Controls the deployment of the parachute.
+- **`sensor_data.py`**: General handler for sensor data.
 
-sensor_data.py: Handles sensor data collection.
+### 6. `dashboards`
+- **`app.py`**: The main application for our dashboard.
+- **`auth.py`**: Manages who gets access to the dashboard.
+- **`exceptions.py`**: Handles errors gracefully.
+- **`sensor_motor_dashboard.py`**: Monitors sensors and motor performance.
+- **`stats_monitor.py`**: Keeps an eye on vital stats during flight.
 
-failsafe.py: Implements safety measures.
+### 7. `ml_integration`
+- **`ai_decision_making.py`**: Trained model for in-flight adjustments
+- **`autopilot.py`**: Movement towards waypoints if needed
+- **`rth.py`**: Return to home (Useless until the end of time)
 
-auth.py: Manages user authentication.
 
-logging_config.py: Configures logging.
+### 8. `telemetry`
+- **`sd_receiver.py`**: Receives data from SD cards.
+- **`sd_transmitter.py`**: Sends data out.
 
-exceptions.py: Custom error handling.
+### 9. `tracking`
+- **`tracker.py`**: The main script for tracking.
 
-autopilot.py: Controls autopilot functions.
+### 10. `tests`
+- **`test_ai_decision_making.py`**: Tests our AI decision-making algorithms.
+- **`test_analysis.py`**: Ensures our data analysis scripts are solid.
+- **`test_auth.py`**: Tests the authentication system.
+- **`test_autopilot.py`**: Checks if the autopilot works as expected.
+- **`test_data_logging_to_db.py`**: Makes sure data logging to the database is smooth.
+- **`test_failsafe.py`**: Verifies that the failsafe mechanisms work.
+- **`test_flight_model_training.py`**: Tests the flight model training process.
+- **`test_gpio_controller.py`**: Ensures the GPIO controller functions correctly.
+- **`test_iot_client.py`**: Tests IoT connectivity.
+- **`test_parachute_controller.py`**: Ensures the parachute controller deploys the chute properly.
+- **`test_report_generation.py`**: Checks the report generation process.
+- **`test_rth.py`**: Tests the return-to-home functionality.
+- **`test_sensor_motor_dashboard.py`**: Tests the dashboard for sensor and motor data.
 
-parachute_controller.py: Manages parachute deployment.
+### Other Important Files
+- **`Dockerfile`**: For containerizing the application.
+- **`LICENSE`**: Details about the project’s license.
+- **`README.md`**: You're reading it!
+- **`requirements.txt`**: All the Python dependencies you'll need.
+- **`rocket_1.py`**: The main script to run the rocket’s control system.
+- **`settings.py`**: Configuration settings for the entire project.
 
-rth.py: Return-to-Home logic.
+## Getting Started
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd rocket_code
 
-i2c_controller.py: Handles I2C device communication.
+2. **Install dependancies**:
+   ```bash
+   pip install -r requirements.txt
 
-mpu6050_reader.py: Reads data from MPU6050 sensors.
+3. **Testing**:
+   ```bash
+   bash scripts/run_tests.sh
 
-bmp280_reader.py: Reads data from BMP280 sensors.
-
-gps_reader.py: Processes GPS data.
-
-ai_decision_making.py: AI for real-time decision-making.
-
-sd_receiver.py: Receives telemetry data.
-
-sd_transmitter.py: Transmits telemetry data.
-
-sensor_logs.csv: Example file for logged sensor data.
-
-test_dashboard.py: Tests for the dashboard.
-
-test_gpio_controller.py: Tests for GPIO control.
-
-test_motor.py: Tests for motor control.
-
-test_sensor_data.py: Tests for sensor data handling.
-
-test_failsafe.py: Tests for failsafe functions.
-
-test_auth.py: Tests for authentication.
-
-test_autopilot.py: Tests for autopilot logic.
-
-test_parachute.py: Tests for parachute control.
-
-test_rth.py: Tests for Return-to-Home logic.
-
-setup.sh: Sets up the project environment.
-
-run_tests.sh: Runs all unit tests.
-
-deploy.sh: Deploys the application.
-
-Forgot to do a commit today so this is gonna be it :333
+4. **Deployment**:
+   ```bash
+   bash scripts/deploy.sh

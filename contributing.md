@@ -16,7 +16,6 @@ We're thrilled that you're interested in contributing to our project! Whether yo
     git clone https://github.com/GyroOW/rocket_code.git
     cd rocket_code
 
-
 3. **Creating a new branch**:
    ```bash
    git checkout -b your-branch-name

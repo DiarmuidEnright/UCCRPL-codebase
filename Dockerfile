@@ -14,18 +14,14 @@ RUN apt-get update && apt-get install -y \
     gpsd-clients \
     gpsd \
     wkhtmltopdf \
-    git \  # Install git for cloning the repository
+    git \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /rocket
+WORKDIR /app
 
 RUN git clone https://github.com/GyroOW/rocket_code.git .
-
-COPY requirements.txt /rocket/
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["python", "rocket_1.py"]
-
-docker build -t my-rocket https://github.com/GyroOW/rocket_code

@@ -11,7 +11,7 @@ matplotlib==3.7.2
 # Adafruit sensor libraries (for Raspberry Pi)
 adafruit-circuitpython-bmp280==3.3.2
 adafruit-circuitpython-mpu6050==1.2.4
-adafruit-circuitpython-sd==5.9.0
+adafruit-circuitpython-sd==2.3.17
 
 # GPIO control and other Raspberry Pi specific libraries
 RPi.GPIO==0.7.1

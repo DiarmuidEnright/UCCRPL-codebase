@@ -16,7 +16,7 @@ adafruit-circuitpython-sd==3.3.23
 # GPIO control and other Raspberry Pi specific libraries
 RPi.GPIO==0.7.1
 picamera==1.13
-gpsd-py3==0.18
+gpsd-py3==0.3.0
 pyserial==3.5
 
 # PDF generation and template rendering

@@ -30,8 +30,7 @@ AWSIoTPythonSDK==1.4.9
 Flask==2.3.3
 
 # Memory and performance profiling
-memory-profiler==0.61.0
-cProfile==3.7
+memory-profiler==0.61.0 # removed cProfile
 pstats==5.0.0  # pstats is part of Python's standard library, so it's not usually listed
 
 # GUI development with Tkinter

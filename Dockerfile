@@ -17,13 +17,15 @@ RUN apt-get update && apt-get install -y \
     git \  # Install git for cloning the repository
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /rocket
 
 RUN git clone https://github.com/GyroOW/rocket_code.git .
 
-COPY requirements.txt /app/
+COPY requirements.txt /rocket/
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["python", "rocket_1.py"]
+
+docker build -t my-rocket https://github.com/GyroOW/rocket_code

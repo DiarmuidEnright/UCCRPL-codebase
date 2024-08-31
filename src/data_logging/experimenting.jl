@@ -12,7 +12,7 @@ using DataFrames
 using Tables
 using Plots
 
-db = SQLite.DB("rocket_project.db")
+db = SQLite.DB("flight_data.db")
 
 flight_data = DBInterface.execute(db, "SELECT * FROM flight_data")
 flights_df = DataFrame(Tables.columntable(flight_data))

@@ -25,6 +25,6 @@ RUN git clone https://github.com/GyroOW/rocket_code.git .
 COPY requirements.txt /app/
 
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt
 
-CMD ["python", "rocket_1.py"]
+CMD ["python", "master.py"]

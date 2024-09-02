@@ -1,7 +1,5 @@
 import tkinter as tk
 from tkinter import ttk, simpledialog, messagebox
-from threading import Thread
-from flask import Flask, request
 import RPi.GPIO as GPIO
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg

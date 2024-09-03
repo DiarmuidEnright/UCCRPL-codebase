@@ -22,9 +22,9 @@ WORKDIR /rocket_code
 
 RUN git clone https://github.com/GyroOW/rocket_code.git .
 
-COPY requirements.txt /rocket_code/
+COPY requirements.txt /app/
 
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r /rocket_code/requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt
 
 CMD ["python", "master.py"]

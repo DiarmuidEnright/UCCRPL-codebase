@@ -15,7 +15,7 @@ adafruit-circuitpython-sd==3.2.0
 
 # GPIO control and other Raspberry Pi specific libraries
 RPi.GPIO==0.7.1
-picamera==1.13
+#picamera==1.13
 gpsd-py3==0.2.0
 pyserial==3.5
 

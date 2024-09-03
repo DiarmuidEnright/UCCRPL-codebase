@@ -18,13 +18,13 @@ RUN apt-get update && apt-get install -y \
     libpython3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /rocket_code
 
 RUN git clone https://github.com/GyroOW/rocket_code.git .
 
-COPY requirements.txt /app/
+COPY requirements.txt /rocket_code/
 
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r /requirements.txt
+RUN pip install --no-cache-dir -r /rocket_code/requirements.txt
 
 CMD ["python", "master.py"]

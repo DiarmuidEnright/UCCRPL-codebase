@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
     libpython3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /rocket_code
+WORKDIR /app
 
 RUN git clone https://github.com/GyroOW/rocket_code.git .
 

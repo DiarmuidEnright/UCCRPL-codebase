@@ -40,7 +40,6 @@ unittest2==1.1.0
 
 <<<<<<< HEAD
 pyspy==0.1.1
-=======
-#pyspy==0.1.1
+
 #this thing is making me insane (fix later)
 #maybe keep

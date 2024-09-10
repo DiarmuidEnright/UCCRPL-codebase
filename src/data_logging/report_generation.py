@@ -21,3 +21,5 @@ if __name__ == "__main__":
     report_gen = ReportGenerator()
     report_gen.generate_report(1)
     report_gen.close()
+
+#buh

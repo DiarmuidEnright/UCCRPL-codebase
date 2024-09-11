@@ -19,3 +19,5 @@ class IoTClient:
 
     def subscribe(self, topic: str, callback: Callable[[Any], None]) -> None:
         self.client.subscribe(topic, 1, callback)
+
+#I forgot again :skull:

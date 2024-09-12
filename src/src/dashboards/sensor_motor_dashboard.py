@@ -196,6 +196,7 @@ class SensorMotorDashboard(tk.Tk):
         except Exception as e:
             logging.error(f"Error during authentication: {e}")
             messagebox.showerror("Authentication Error", f"Failed to authenticate: {e}")
+            #I forgot
 
 if __name__ == "__main__":
     initialize_gpio()

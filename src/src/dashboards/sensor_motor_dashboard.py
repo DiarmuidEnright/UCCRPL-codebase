@@ -208,4 +208,4 @@ if __name__ == "__main__":
     finally:
         cleanup_gpio()
         logging.info("GPIO cleanup complete.")
-#I forgor :skull:
+#I forgor :skull: :3

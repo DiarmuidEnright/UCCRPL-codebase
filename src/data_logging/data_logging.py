@@ -40,3 +40,5 @@ def log_data() -> None:
 while True:
     log_data()
     time.sleep(1)
+
+#ignore this

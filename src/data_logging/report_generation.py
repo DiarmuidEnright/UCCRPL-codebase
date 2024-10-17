@@ -23,3 +23,15 @@ if __name__ == "__main__":
     report_gen.close()
 
 #buh
+
+class ReportAnalyzer:
+    def __init__(self, db_path: str = 'flight_data.db') -> None:
+        self.conn: sqlite3.Connection = sqlite3.connect(db_path)
+
+    def analyze_report(self, flight_id: int) -> None:
+        df: pd.DataFrame = pd.read_sql_query(f"SELECT * FROM sensor_data WHERE flight_id={flight_id}", self.conn)
+        # Perform some analysis on the data
+        print(df.describe())
+
+    def close(self) -> None:
+        self.conn.close()

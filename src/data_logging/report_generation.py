@@ -35,3 +35,10 @@ class ReportAnalyzer:
 
     def close(self) -> None:
         self.conn.close()
+
+    def process_report(self, flight_id: int) -> None:
+        self.analyze_report(flight_id)
+        report_gen = ReportGenerator()
+        report_gen.generate_report(flight_id)
+        report_gen.close()
+

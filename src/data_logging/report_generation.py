@@ -42,3 +42,19 @@ class ReportAnalyzer:
         report_gen.generate_report(flight_id)
         report_gen.close()
 
+
+
+class something():
+    def __init__(self):
+        self.random()
+
+    def do_something(self):
+        pass
+
+    def do_something_else(self):
+        pass
+
+    def __str__():
+        return "something"
+
+something().do_something()

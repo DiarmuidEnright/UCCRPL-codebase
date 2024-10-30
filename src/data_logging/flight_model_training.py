@@ -34,6 +34,15 @@ class FlightPredictor:
         accuracy: float = accuracy_score(y_test, y_pred)
         print(f"Model Accuracy: {accuracy:.2f}")
 
+    def re_train_model(self) -> None:
+        raise NotImplementedError
+        return NotImplementedError
+    
+    def remove_contaminated_data(self) -> None:
+        raise NotImplementedError #temp variable
+        return NotImplementedError #temp
+
+
     def close(self) -> None:
         self.conn.close()
 
